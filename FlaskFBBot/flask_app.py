@@ -13,18 +13,20 @@ with open('config.json') as data_file:
     data = json.load(data_file)
 
 token = data["token"]
-print(token)
 verify_token = "wut"
 bot = FBBot(token, verify_token)
 
 @app.route('/')
 @app.route('/home')
 def home():
-    on_message(888742144586980, "Video", "")
-    on_message(888742144586980, "Generic", "")
-    on_message(888742144586980, "Receipt", "")
-    on_message(888742144586980, "Image", "")
-    on_message(888742144586980, "Wut", "")
+    #print(str(bot.set_greeting_text('Greeting text!!!')))
+    #print(str(bot.set_get_started_button('get started postback')))
+    #print(str(bot.set_persistent_menu([ FBAttachment.button_web_url("Google", "http://google.com/?q=facebook") ])))
+    #on_message(888742144586980, "Video", "")
+    #on_message(888742144586980, "Generic", "")
+    #on_message(888742144586980, "Receipt", "")
+    #on_message(888742144586980, "Image", "")
+    #on_message(888742144586980, "Wut", "")
     return "Hello there! "+str(datetime.now())
 
 @app.route('/webhook', methods=['GET', 'POST'])

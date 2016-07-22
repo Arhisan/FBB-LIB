@@ -22,7 +22,8 @@ class FBBot(object):
         self.app_secret = kwargs.get('app_secret')
 
         self.graph_url = 'https://graph.facebook.com/v{0}'.format(self.api_version)
-        self.request_endpoint = '{0}/me/messages'.format(self.graph_url)
+        self.request_endpoint_message = '{0}/me/messages'.format(self.graph_url)
+        self.request_endpoint_setting = '{0}/me/thread_settings'.format(self.graph_url)
         
     @property
     def auth_args(self):
@@ -72,6 +73,75 @@ class FBBot(object):
 
             return "success"
 
+    def set_greeting_text(self, greeting_text):
+        '''
+            @required:
+                greeting_text
+            @output:
+                response_json
+        '''
+        payload = {
+          "setting_type":"greeting",
+          "greeting":{
+            "text":greeting_text
+          }
+        }
+        return self._send_payload(payload, self.request_endpoint_setting)
+
+    def set_get_started_button(self, postback_text):
+        '''
+            @required:
+                postback_text
+            @output:
+                response_json
+        '''
+        payload = {
+          "setting_type":"call_to_actions",
+          "thread_state":"new_thread",
+          "call_to_actions":[
+            {
+              "payload":postback_text
+            }
+          ]
+        }
+        return self._send_payload(payload, self.request_endpoint_setting)
+
+    def delete_get_started_button(self):
+        '''
+            @output:
+                response_json
+        '''
+        payload = {
+          "setting_type":"call_to_actions",
+          "thread_state":"new_thread"
+        }
+        return self._send_payload(payload, self.request_endpoint_setting, 'delete')
+
+    def set_persistent_menu(self, buttons):
+        '''
+            @required:
+                buttons array, up to 5 buttons, each is FBAttachment.button...
+            @output:
+                response_json
+        '''
+        payload = {
+          "setting_type" : "call_to_actions",
+          "thread_state" : "existing_thread",
+          "call_to_actions":buttons
+        }
+        return self._send_payload(payload, self.request_endpoint_setting)
+
+    def delete_persistent_menu(self):
+        '''
+            @output:
+                response_json
+        '''
+        payload = {
+          "setting_type" : "call_to_actions",
+          "thread_state" : "existing_thread"
+        }
+        return self._send_payload(payload, self.request_endpoint_setting, 'delete')
+        
     def send_text_message(self, recipient_id, text, quick_replies = []):
         '''
             @required:
@@ -93,7 +163,7 @@ class FBBot(object):
                 'quick_replies': quick_replies
             }
         }
-        return self._send_payload(payload)
+        return self._send_payload(payload, self.request_endpoint_message)
 
     def send_message_file_attachment(self, recipient_id, attachment_type, file_url, quick_replies = []):
         '''
@@ -205,17 +275,28 @@ class FBBot(object):
                     'quick_replies': quick_replies
                 }
             }
-        return self._send_payload(payload)
+        return self._send_payload(payload, self.request_endpoint_message)
     
-    def _send_payload(self, payload):
+    def _send_payload(self, payload, request_endpoint, request_type = 'post'):
         '''
             @required:
                 payload
+            @optional:
+                request_type - 'post' or 'delete'
         '''
-        response = requests.post(
-            self.request_endpoint,
-            params=self.auth_args,
-            json=payload
-        )
-        #print ('Response result: '+str(response.json()))
-        return response.json()
+        if(request_type == 'post'):
+            response = requests.post(
+                request_endpoint,
+                params=self.auth_args,
+                json=payload
+            )
+            #print ('Response result: '+str(response.json()))
+            return response.json()
+        if(request_type == 'delete'):
+            response = requests.delete(
+                request_endpoint,
+                params=self.auth_args,
+                json=payload
+            )
+            #print ('Response result: '+str(response.json()))
+            return response.json()
