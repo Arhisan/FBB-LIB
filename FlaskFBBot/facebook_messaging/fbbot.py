@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import json
 import hashlib
 import hmac
@@ -22,6 +23,7 @@ class FBBot(object):
         self.app_secret = kwargs.get('app_secret')
 
         self.graph_url = 'https://graph.facebook.com/v{0}'.format(self.api_version)
+       # self.request_endpoint = '{0}/me/messages?access_token={1}'.format(self.graph_url,self.access_token)
         self.request_endpoint_message = '{0}/me/messages'.format(self.graph_url)
         self.request_endpoint_setting = '{0}/me/thread_settings'.format(self.graph_url)
         
@@ -46,7 +48,11 @@ class FBBot(object):
         generated_hash = hmac_object.hexdigest()
         return generated_hash
 
-    def webhook(self, request, on_message_received, on_postback_received):
+    def get_userinfo(self, user_id):
+        resp = requests.get("https://graph.facebook.com/v2.6/{0}?fields=first_name,last_name,profile_pic,locate,timezone,gender&access_token={1}".format(user_id,self.access_token))
+        return resp.json
+
+    def webhook(self, request, on_message_received, on_postback_received, on_account_linked="", on_account_unlinked=""):
         '''
             @required:
                 request
@@ -55,6 +61,8 @@ class FBBot(object):
             @output:
                 htmlView
         '''
+        print (request)
+        print(request.json)
         if request.method == 'GET':
             if (request.args.get("hub.verify_token") == self.verify_token):
                     return request.args.get("hub.challenge")
@@ -70,8 +78,13 @@ class FBBot(object):
                     on_message_received(sender_id, message, x)
                 elif (x.get('postback') and x['postback'].get('payload')):
                     on_postback_received(sender_id, x['postback']['payload'], x)
+                elif(x.get('account_linking') and x['account_linking'].get('status')):
+                    if(x['account_linking']['status']=='linked'):
+                        on_account_linked(sender_id,x['account_linking']['authorization_code'],x)
+                    elif (x['account_linking']['status']=='unlinked'):
+                        on_account_unlinked(sender_id,x)
 
-            return "success"
+            return "ok"
 
     def set_greeting_text(self, greeting_text):
         '''
@@ -141,7 +154,8 @@ class FBBot(object):
           "thread_state" : "existing_thread"
         }
         return self._send_payload(payload, self.request_endpoint_setting, 'delete')
-        
+
+
     def send_text_message(self, recipient_id, text, quick_replies = []):
         '''
             @required:
@@ -252,7 +266,7 @@ class FBBot(object):
             "type":"template",
             "payload":fborder.get_payload()
         }
-        return self._send_message(recipient_id, attachment, quick_replies)
+
 
     def _send_message(self, recipient_id, attachment, quick_replies = []):
         '''

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 class FBOrder(object):
     def __init__(self, recipient_name, order_number, currency, payment_method, order_url, timestamp, purchases_array, address, price_summary, price_adjustments_array, **kwargs):
         self.recipient_name = recipient_name

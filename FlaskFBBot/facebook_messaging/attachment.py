@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 class FBAttachment():
     class File():
         image = 'image'
@@ -17,6 +18,17 @@ class FBAttachment():
             'type': 'web_url',
             'title': title,
             'url': url
+        }
+
+    def button_account_link(url):
+        return {
+            'type': 'account_link',
+            'url': url
+        }
+
+    def button_account_unlink(self=""):
+        return {
+            'type': 'account_unlink'
         }
 
     def quick_reply(title):

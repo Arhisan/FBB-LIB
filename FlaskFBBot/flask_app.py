@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from flask import Flask
 app = Flask(__name__)
 
@@ -9,29 +10,21 @@ from facebook_messaging.order import FBOrder
 from facebook_messaging.attachment import FBAttachment
 
 import json
-with open('config.json') as data_file:    
-    data = json.load(data_file)
-
-token = data["token"]
-verify_token = "wut"
+myID = "1139030979472570"
+token = "EAAEJHb3j43EBAOBCw4b8p1imgCuItxznCXpVqslKwq3D4geJEWZAAkbZCxngTy9jm6335PgsCSV7S5vbZCJLZCRGGKZBB0mPL5mBdznnwQVZA7ejF8vS2tyw2mraoFq3GeEZCch97CYHHfiwYQ4BtK4k6AG7xzCkkwOT7gWFipdgAZDZD"
+print(token)
+verify_token = "secret"
 bot = FBBot(token, verify_token)
 
-@app.route('/')
-@app.route('/home')
-def home():
-    #print(str(bot.set_greeting_text('Greeting text!!!')))
-    #print(str(bot.set_get_started_button('get started postback')))
-    #print(str(bot.set_persistent_menu([ FBAttachment.button_web_url("Google", "http://google.com/?q=facebook") ])))
-    #on_message(888742144586980, "Video", "")
-    #on_message(888742144586980, "Generic", "")
-    #on_message(888742144586980, "Receipt", "")
-    #on_message(888742144586980, "Image", "")
-    #on_message(888742144586980, "Wut", "")
-    return "Hello there! "+str(datetime.now())
-
-@app.route('/webhook', methods=['GET', 'POST'])
+@app.route('/', methods=['GET', 'POST'])
 def webhook():
-    return bot.webhook(request, on_message, on_postback)
+    return bot.webhook(request, on_message, on_postback, on_linked, on_unlinked)
+
+def on_linked(sender, login, requestInfo):
+    print(sender+" "+ login)
+
+def on_unlinked(sender, requestInfo):
+    print(sender+" unlink")
 
 def on_postback(sender, text, requestInfo):
     bot.send_text_message(sender, 'Received postback "{0}"'.format(text))
@@ -44,8 +37,7 @@ def on_message(sender, text, requestInfo):
     elif(text == "Generic"):
         bot.send_message_generic(sender, "Generic message", "with image and button", "https://scontent.xx.fbcdn.net/t39.3138-6/p128x128/12056981_908479762570256_1493516739_n.jpg", 
                                  [ 
-                                     FBAttachment.button_web_url("Google", "http://google.com/?q=facebook"),
-                                     FBAttachment.button_postback("Button title","Button postback")
+                                     FBAttachment.button_account_unlink()
                                  ])
     elif(text == "Receipt"):
         order = FBOrder(
