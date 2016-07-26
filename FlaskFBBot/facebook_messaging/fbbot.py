@@ -266,7 +266,7 @@ class FBBot(object):
             "type":"template",
             "payload":fborder.get_payload()
         }
-
+        return self._send_message(recipient_id, attachment, quick_replies)
 
     def _send_message(self, recipient_id, attachment, quick_replies = []):
         '''
