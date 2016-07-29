@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 class FBOrder(object):
-    def __init__(self, recipient_name, order_number, currency, payment_method, order_url, timestamp, purchases_array, address, price_summary, price_adjustments_array, **kwargs):
+    def __init__(self, recipient_name, order_number, currency, payment_method, purchases_array, price_summary, order_url="", address="", timestamp="", price_adjustments_array="", **kwargs):
         self.recipient_name = recipient_name
         self.order_number = order_number
         self.currency = currency
@@ -12,7 +12,7 @@ class FBOrder(object):
         self.price_summary = price_summary
         self.price_adjustments = price_adjustments_array
 
-    def one_purchase(title, subtitle, quantity, price, currency, image_url):
+    def one_purchase(title,  price, subtitle="", quantity="",currency="", image_url=""):
         return {
             "title":title,
             "subtitle":subtitle,
@@ -24,12 +24,12 @@ class FBOrder(object):
 
     def address(street1, street2, city, postal_code, state, country):
         return {
-            "street_1":"1 Hacker Way",
-            "street_2":"",
-            "city":"Menlo Park",
-            "postal_code":"94025",
-            "state":"CA",
-            "country":"US"
+            "street_1":street1,
+            "street_2":street2,
+            "city":city,
+            "postal_code":postal_code,
+            "state":state,
+            "country":country
         }
 
     def price_summary(subtotal, shipping_cost, total_tax, total_cost):
@@ -52,9 +52,9 @@ class FBOrder(object):
             "recipient_name":self.recipient_name,
             "order_number":self.order_number,
             "currency":self.currency,
-            "payment_method":self.payment_method,        
+            "payment_method":self.payment_method,
             "order_url":self.order_url,
-            "timestamp":self.timestamp, 
+            "timestamp":self.timestamp,
             "elements":self.purchases,
                     #{
                     #  "title":"Classic White T-Shirt",
@@ -68,4 +68,5 @@ class FBOrder(object):
             "summary":self.price_summary,
             "adjustments":self.price_adjustments
         }
+
 

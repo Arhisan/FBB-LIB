@@ -252,7 +252,7 @@ class FBBot(object):
         }
         return self._send_message(recipient_id, attachment, quick_replies)
 
-    def send_message_receipt(self, recipient_id, fborder, quick_replies = []):
+    def send_message_TypeC(self, recipient_id, fborder, quick_replies = []):
         '''
             @required:
                 recipient_id
@@ -298,13 +298,14 @@ class FBBot(object):
             @optional:
                 request_type - 'post' or 'delete'
         '''
+        print(payload)
         if(request_type == 'post'):
             response = requests.post(
                 request_endpoint,
                 params=self.auth_args,
                 json=payload
             )
-            #print ('Response result: '+str(response.json()))
+            print ('Response result: '+str(response.json()))
             return response.json()
         if(request_type == 'delete'):
             response = requests.delete(
@@ -312,5 +313,5 @@ class FBBot(object):
                 params=self.auth_args,
                 json=payload
             )
-            #print ('Response result: '+str(response.json()))
+            print ('Response result: '+str(response.json()))
             return response.json()
